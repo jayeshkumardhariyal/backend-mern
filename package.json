@@ -1,0 +1,21 @@
+{
+  "name": "backend1",
+  "version": "1.0.0",
+  "description": "backend for learning",
+  "keywords": [
+    "node"
+  ],
+  "license": "ISC",
+  "author": "Jayesh Dhariyal",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
