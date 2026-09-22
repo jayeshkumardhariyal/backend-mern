@@ -14,11 +14,13 @@
     "start": "cross-env NODE_ENV=production node src/index.js"
   },
   "dependencies": {
+    "cloudinary": "^2.11.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mongoose": "^9.10.1",
+    "multer": "^2.4.0",
     "prettier": "^3.9.7"
   },
   "devDependencies": {
