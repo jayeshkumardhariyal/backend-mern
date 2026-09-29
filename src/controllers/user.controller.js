@@ -4,7 +4,7 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/claudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
-import { Mongoose } from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
@@ -331,7 +331,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Username is missing");
   }
 
-  const channel = User.aggregate([
+  const channel = await User.aggregate([
     {
       $match: {
         username: username.toLowerCase(),
@@ -363,9 +363,9 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         },
         isSubscribed: {
           $cond: {
-            $if: { $in: [req.users?._id, "$subscribers.subscriber"] },
-            $then: true,
-            $else: false,
+            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+            then: true,
+            else: false,
           },
         },
       },
@@ -387,17 +387,16 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     throw new ApiError(404, "channel does not exist");
   }
 
-  return (
-    res.status(200),
-    json(new ApiResponse(200, channel[0], "user channel fetched succesfully"))
-  );
+  return res
+    .status(200)
+    .json(new ApiResponse(200, channel[0], "user channel fetched succesfully"));
 });
 
 const getWatchHistory = asyncHandler(async (req, res) => {
   const user = await User.aggregate([
     {
       $match: {
-        _id: new Mongoose.Types.ObjectId(req.user?._id),
+        _id: new mongoose.Types.ObjectId(req.user?._id),
       },
     },
     {
@@ -408,19 +407,21 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         as: "watchHistory",
         pipeline: [
           {
-            from: "users",
-            localField: "owner",
-            foreignField: "_id",
-            as: "owner",
-            pipeline: [
-              {
-                $project: {
-                  fullName: 1,
-                  username: 1,
-                  avatar: 1,
+            $lookup: {
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "owner",
+              pipeline: [
+                {
+                  $project: {
+                    fullName: 1,
+                    username: 1,
+                    avatar: 1,
+                  },
                 },
-              },
-            ],
+              ],
+            },
           },
         ],
       },
